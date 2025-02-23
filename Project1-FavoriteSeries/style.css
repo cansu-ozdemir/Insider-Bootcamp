@@ -777,7 +777,6 @@ footer {
 
 
 @media (max-width: 768px) {
-
     body {
         overflow-x: hidden;
         width: 100%;
@@ -801,7 +800,6 @@ footer {
     .episodes-container {
         margin: 0 15px;
     }
-
 
     .nav-links {
         display: none;
@@ -897,19 +895,19 @@ footer {
         max-width: 300px;
     }
 
-    #home:target ~ .navbar .menu-toggle,
-    #about:target ~ .navbar .menu-toggle,
-    #characters:target ~ .navbar .menu-toggle,
-    #scene:target ~ .navbar .menu-toggle,
-    #episodes:target ~ .navbar .menu-toggle {
-        display: none;
+    #home:target ~ .navbar #menu-toggle,
+    #about:target ~ .navbar #menu-toggle,
+    #characters:target ~ .navbar #menu-toggle,
+    #scene:target ~ .navbar #menu-toggle,
+    #episodes:target ~ .navbar #menu-toggle {
+        pointer-events: none;
     }
 
     #home:target ~ .navbar .mobile-nav,
     #about:target ~ .navbar .mobile-nav,
     #characters:target ~ .navbar .mobile-nav,
     #scene:target ~ .navbar .mobile-nav,
-    #episodes:target ~ .navbar .mobile-nav {
+    #episodes:target ~ .navbar #mobile-nav {
         right: -100%;
     }
 
@@ -925,15 +923,43 @@ footer {
     #about:target ~ .navbar .hamburger span::before,
     #characters:target ~ .navbar .hamburger span::before,
     #scene:target ~ .navbar .hamburger span::before,
-    #episodes:target ~ .navbar .hamburger span::before,
+    #episodes:target ~ .navbar .hamburger span::before {
+        top: -8px;
+        transform: none;
+    }
+
     #home:target ~ .navbar .hamburger span::after,
     #about:target ~ .navbar .hamburger span::after,
     #characters:target ~ .navbar .hamburger span::after,
     #scene:target ~ .navbar .hamburger span::after,
     #episodes:target ~ .navbar .hamburger span::after {
+        bottom: -8px;
         transform: none;
-        top: auto;
-        bottom: auto;
+    }
+
+    .tabs-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .tabs-nav label {
+        flex: 0 1 auto;
+        min-width: calc(33.333% - 8px);
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .footer-links {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+
+    .footer-links a {
+        flex: 0 1 auto;
+        font-size: 0.9rem;
+        padding: 5px 10px;
     }
 }
 
@@ -948,16 +974,25 @@ footer {
     }
 
     .episodes-container {
-        padding: 1.5rem;
+        padding: 1rem;
+        margin: 0 10px;
     }
 
     .tabs-nav label {
-        font-size: 0.9rem;
-        padding: 0.8rem;
+        min-width: calc(50% - 8px);
+        font-size: 0.85rem;
+        padding: 6px;
+    }
+
+    .footer-links {
+        gap: 0.5rem;
+    }
+
+    .footer-links a {
+        font-size: 0.85rem;
+        padding: 4px 8px;
     }
 }
-
-
 
 
 @keyframes glitch1 {
