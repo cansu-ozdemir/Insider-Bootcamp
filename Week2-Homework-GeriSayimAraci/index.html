@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geri Sayım Aracı</title>
+
+    <style>
+
+        body {
+            font-family: Ariel, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input {
+            padding: 8px;
+            width: 80px;
+            font-size: 16px;
+            text-align: center;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #startButton {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #startButton:hover {
+            background-color: #45a049;
+        }
+
+        #resetButton {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #resetButton:hover {
+            background-color: #d32f2f;
+        }
+
+        #countdown {
+            font-size: 2.5rem;
+            margin: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-container {
+            margin: 15px 0;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <h1>Geri Sayım Aracı</h1>
+
+        <div class="input-container">
+            <label for="timeInput">Süre (saniye):</label>
+            <input type="number" id="timeInput" min="1" value="10">
+        </div>
+
+        <button id="startButton">Başlat</button>
+        <button id="resetButton">Sıfırla</button>
+
+        <p id="countdown">10</p>
+    </div>
+
+
+    <script>
+
+        const timeInput = document.getElementById('timeInput');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const countdownElement = document.getElementById('countdown');
+
+        let countdownInterval;
+        let timeLeft;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            countdownElement.textContent = timeInput.value;
+        });
+
+
+        startButton.addEventListener('click', function() {
+            
+            clearInterval(countdownInterval);
+
+            timeLeft = parseInt(timeInput.value);
+            if (isNaN(timeLeft) || timeLeft <= 0) {
+                alert("Lütfen geçerli bir süre girin!");
+                return;
+            }
+
+            countdownElement.textContent = timeLeft;
+
+            countdownInterval = setInterval(function() {
+                timeLeft--;
+
+                countdownElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+
+                    countdownElement.textContent = "Süre doldu!";
+                }
+            }, 1000);
+        });
+
+        resetButton.addEventListener('click', function() {
+            clearInterval(countdownInterval);
+
+            timeInput.value= "10";
+
+            countdownElement.textContent = timeInput.value;
+        });
+
+    </script>
+    
+</body>
+</html>
