@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görev Yönetim Uygulaması</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Görev Yönetim Uygulaması</h1>
+            <div class="filter-container">
+                <button id="show-completed" class="btn filter-btn" title="Filtreleme modu">
+                    <i class="fas fa-filter"></i> Tamamlananları Göster
+                </button>
+
+                <select id="priority-filter" class="filter-select">
+                    <option value="all">Tüm Öncelikler</option>
+                    <option value="high">Yüksek Öncelikli</option>
+                    <option value="medium">Orta Öncelikli</option>
+                    <option value="low">Düşük Öncelikli</option>
+                </select>
+
+                <select id="sort-options" class="filter-select">
+                    <option value="default">Sıralama Seçin</option>
+                    <option value="priority-desc">Yüksek → Düşük Öncelik</option>
+                    <option value="priority-asc">Düşük → Yüksek Öncelik</option>
+                    <option value="date-asc">Eskiden Yeniye</option>
+                    <option value="date-desc">Yeniden Eskiye</option>
+                </select>
+            </div>
+        </header>
+
+
+        <div class="form-container">
+            <form id="task-form">
+                <div class="error-message" id="error-message"></div>
+
+                <div class="form-group">
+                    <label for="task-title">Görev Başlığı <span class="required">*</span></label>
+                    <input type="text" id="task-title" placeholder="Görev Başlığını Girin" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-description">Açıklama</label>
+                    <textarea id="task-description" placeholder="Görev Açıklamasını Girin"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Öncelik <span class="required">*</span></label>
+
+                    <div class="priority-options">
+                        <label class="radio-container">
+                            <input type="radio" name="priority" value="low" required>
+                            <span class="radio-label">Düşük</span>
+                        </label>
+
+                        <label class="radio-container">
+                            <input type="radio" name="priority" value="medium">
+                            <span class="radio-label">Orta</span>
+                        </label>
+
+                        <label class="radio-container">
+                            <input type="radio" name="priority" value="high">
+                            <span class="radio-label">Yüksek</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn submit-btn">
+                    <i class="fas fa-plus"></i> Görev Ekle
+                </button>
+            </form>
+        </div>
+
+        <div class="tasks-container">
+            <h2>Görevler</h2>
+            <div id="tasks-list" class="sortable-list">
+
+                <div class="empty-list" id="empty-message">
+                    Henüz bir görev eklenmedi. Yeni bir görev ekleyin!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <h3 class="developer-name">Cansu Özdemir</h3>
+            <p class="copyright">Görev Yönetim Uygulaması &copy; 2025</p>
+        </div>
+    </footer>
+
+    <template id="task-template">
+        <div class="task-item" data-id="" draggable="true">
+            <div class="task-content">
+                <div class="task-header">
+                    <h3 class="task-title"></h3>
+                    <span class="task-priority"></span>
+                </div>
+                <p class="task-description"></p>
+            </div>
+            <div class="task-actions">
+                <button class="btn complete-btn" title="Tamamla">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="btn delete-btn" title="Sil">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+    
+</body>
+</html>
