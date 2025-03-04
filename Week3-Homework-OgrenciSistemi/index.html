@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Yönetim Sistemi</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #388E3C;
+        }
+
+        .selected {
+            background-color: #e0f7fa !important;
+        }
+        
+        .editable {
+            background-color: #fffde7 !important;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            grid-column: span 2;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        .highlight-input {
+            border: 2px solid #4CAF50 !important;
+            background-color: #f0fff0;
+        }
+        
+        .notification {
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        #searchInput {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .edit-cell {
+            background-color: #fff8e1;
+            padding: 0 !important;
+        }
+        
+        .edit-cell input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #FFC107;
+            border-radius: 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .filter-panel {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .hide-notification {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <h1>Öğrenci Yönetim Sistemi</h1>
+        
+        <form id="ogrenciForm">
+            <div>
+                <label for="ad">Öğrenci Adı:</label>
+                <input type="text" id="ad" name="ad" required>
+            </div>
+            <div>
+                <label for="soyad">Öğrenci Soyadı:</label>
+                <input type="text" id="soyad" name="soyad" required>
+            </div>
+            <div>
+                <label for="sinif">Sınıf:</label>
+                <select id="sinif" name="sinif" required>
+                    <option value="">Sınıf Seçin</option>
+                    <option value="9">9. Sınıf</option>
+                    <option value="10">10. Sınıf</option>
+                    <option value="11">11. Sınıf</option>
+                    <option value="12">12. Sınıf</option>
+                </select>
+            </div>
+            <div>
+                <label for="numara">Okul Numarası:</label>
+                <input type="number" id="numara" name="numara" required>
+            </div>
+            <button type="submit" id="ekleBtn">Öğrenci Ekle</button>
+        </form>
+        
+        <div class="filter-section">
+            <input type="text" id="searchInput" placeholder="Öğrenci ara...">
+            <select id="sinifFilter">
+                <option value="">Tüm Sınıflar</option>
+                <option value="9">9. Sınıf</option>
+                <option value="10">10. Sınıf</option>
+                <option value="11">11. Sınıf</option>
+                <option value="12">12. Sınıf</option>
+            </select>
+            <div class="hide-notification">
+                <input type="checkbox" id="hideNotifications">
+                <label for="hideNotifications">Bildirimleri Gizle</label>
+            </div>
+        </div>
+        
+        <table id="ogrenciTablosu">
+            <thead>
+                <tr>
+                    <th data-sort="id">No</th>
+                    <th data-sort="ad">Ad</th>
+                    <th data-sort="soyad">Soyad</th>
+                    <th data-sort="sinif">Sınıf</th>
+                    <th data-sort="numara">Okul Numarası</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="notification" id="notification">Öğrenci başarıyla eklendi!</div>
+
+
+
+    <script>
+    
+    $(document).ready(function() {
+        let studentData = [
+        { id: 1, ad: "Frodo", soyad: "Baggins", sinif: "9", numara: "123" },
+        { id: 2, ad: "Gandalf", soyad: "Grey", sinif: "12", numara: "234" },
+        { id: 3, ad: "Aragorn", soyad: "Arathorn", sinif: "11", numara: "345" },
+        { id: 4, ad: "Legolas", soyad: "Thranduilion", sinif: "11", numara: "456" },
+        { id: 5, ad: "Gimli", soyad: "Gloinsson", sinif: "10", numara: "567" },
+        { id: 6, ad: "Gollum", soyad: "Smeagol", sinif: "10", numara: "678" },
+        { id: 7, ad: "Samwise", soyad: "Gamgee", sinif: "9", numara: "789" },
+        { id: 8, ad: "Arwen", soyad: "Elrondiel", sinif: "12", numara: "890" }
+    ];
+
+            let sortState = {
+                column: 'id',
+                ascending: true
+            };
+
+            function tabloGuncelle(filtreliData = null) {
+                let tbody = $("#ogrenciTablosu tbody");
+                tbody.empty();
+
+                const veri = filtreliData || studentData;
+
+                const siraliVeri = siralaVeri(veri, sortState.column, sortState.ascending);
+                
+                $.each(siraliVeri, function(index, ogrenci) {
+                    tbody.append(`
+                        <tr data-id="${ogrenci.id}">
+                            <td>${index + 1}</td>
+                            <td>${ogrenci.ad}</td>
+                            <td>${ogrenci.soyad}</td>
+                            <td>${ogrenci.sinif}. Sınıf</td>
+                            <td>${ogrenci.numara}</td>
+                            <td class="action-buttons">
+                                <button class="edit-btn" data-id="${ogrenci.id}">Düzenle</button>
+                                <button class="delete-btn" data-id="${ogrenci.id}">Sil</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+
+            function siralaVeri(veri, sutun, artan) {
+                return veri.sort((a, b) => {
+                    if (a[sutun] < b[sutun]) return artan ? -1 : 1;
+                    if (a[sutun] > b[sutun]) return artan ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            tabloGuncelle();
+
+            function bildirimGoster(mesaj) {
+                if (!$("#hideNotifications").prop("checked")) {
+                    $("#notification").text(mesaj).fadeIn(300).delay(2000).fadeOut(300);
+                }
+            }
+
+            $("input, select").focus(function() {
+                $(this).addClass("highlight-input");
+            });
+
+            $("input, select").blur(function() {
+                $(this).removeClass("highlight-input");
+            });
+
+            $("#numara").keypress(function(e) {
+                if (e.which < 48 || e.which > 57) {
+                    e.preventDefault();
+                    bildirimGoster("Lütfen sadece rakam girin!");
+                }
+            });
+
+            $("#ekleBtn").hover(
+                function() { $(this).css("background-color", "#45a049"); },
+                function() { $(this).css("background-color", "#4CAF50"); }
+            );
+
+            $("#ogrenciTablosu").on("mouseenter", ".delete-btn", function() {
+                $(this).css("background-color", "#d32f2f");
+            }).on("mouseleave", ".delete-btn", function() {
+                $(this).css("background-color", "#f44336");
+            });
+
+            $("#ogrenciTablosu").on("mouseenter", ".edit-btn", function() {
+                $(this).css("background-color", "#1976D2");
+            }).on("mouseleave", ".edit-btn", function() {
+                $(this).css("background-color", "#2196F3");
+            });
+
+            $("#ogrenciForm").submit(function(e) {
+                e.preventDefault();
+
+                let ad = $("#ad").val();
+                let soyad = $("#soyad").val();
+                let sinif = $("#sinif").val();
+                let numara = $("#numara").val();
+
+                let numaraVar = studentData.some(ogrenci => ogrenci.numara === numara);
+                if (numaraVar) {
+                    bildirimGoster("Bu okul numarası zaten kullanılıyor!");
+                    return;
+                }
+
+                let yeniOgrenci = {
+                    id: studentData.length > 0 ? Math.max(...studentData.map(o => o.id)) + 1 : 1,
+                    ad: ad,
+                    soyad: soyad,
+                    sinif: sinif,
+                    numara: numara
+                };
+
+                studentData.push(yeniOgrenci);
+
+                tabloGuncelle();
+
+                bildirimGoster("Öğrenci başarıyla eklendi!");
+
+                this.reset();
+            });
+
+            $("#sinifFilter").change(function() {
+                let secilenSinif = $(this).val();
+                let arananMetin = $("#searchInput").val().toLowerCase();
+                
+                filtreleVeGuncelle(secilenSinif, arananMetin);
+            });
+
+            function filtreleVeGuncelle(sinif, metin) {
+                let filtreliVeri = studentData;
+                
+                if (sinif) {
+                    filtreliVeri = filtreliVeri.filter(ogrenci => ogrenci.sinif === sinif);
+                }
+                
+                if (metin && metin.length > 0) {
+                    filtreliVeri = filtreliVeri.filter(ogrenci => 
+                        ogrenci.ad.toLowerCase().includes(metin) || 
+                        ogrenci.soyad.toLowerCase().includes(metin) ||
+                        ogrenci.numara.includes(metin)
+                    );
+                }
+                
+                tabloGuncelle(filtreliVeri);
+            }
+
+            $("#ogrenciTablosu").on("click", ".delete-btn", function() {
+                let ogrenciId = $(this).data("id");
+
+                studentData = studentData.filter(function(ogrenci) {
+                    return ogrenci.id !== ogrenciId;
+                });
+
+                tabloGuncelle();
+
+                bildirimGoster("Öğrenci silindi!");
+            });
+
+            $("#ogrenciTablosu").on("click", ".edit-btn", function() {
+                let ogrenciId = $(this).data("id");
+                let ogrenci = studentData.find(o => o.id === ogrenciId);
+                let tr = $(this).closest("tr");
+                
+                tr.addClass("editable");
+
+                tr.find("td:nth-child(2)").html(`<input type="text" class="edit-input" data-field="ad" value="${ogrenci.ad}">`);
+                tr.find("td:nth-child(3)").html(`<input type="text" class="edit-input" data-field="soyad" value="${ogrenci.soyad}">`);
+                tr.find("td:nth-child(4)").html(`
+                    <select class="edit-input" data-field="sinif">
+                        <option value="9" ${ogrenci.sinif === "9" ? 'selected' : ''}>9. Sınıf</option>
+                        <option value="10" ${ogrenci.sinif === "10" ? 'selected' : ''}>10. Sınıf</option>
+                        <option value="11" ${ogrenci.sinif === "11" ? 'selected' : ''}>11. Sınıf</option>
+                        <option value="12" ${ogrenci.sinif === "12" ? 'selected' : ''}>12. Sınıf</option>
+                    </select>
+                `);
+                tr.find("td:nth-child(5)").html(`<input type="number" class="edit-input" data-field="numara" value="${ogrenci.numara}">`);
+
+                tr.find("td:last-child").html(`
+                    <button class="save-btn" data-id="${ogrenciId}">Kaydet</button>
+                    <button class="cancel-btn">İptal</button>
+                `);
+
+                tr.find("input:first").focus();
+            });
+
+            $("#ogrenciTablosu").on("click", ".save-btn", function() {
+                let ogrenciId = $(this).data("id");
+                let tr = $(this).closest("tr");
+                let ogrenci = studentData.find(o => o.id === ogrenciId);
+
+                let yeniAd = tr.find("input[data-field='ad']").val();
+                let yeniSoyad = tr.find("input[data-field='soyad']").val();
+                let yeniSinif = tr.find("select[data-field='sinif']").val();
+                let yeniNumara = tr.find("input[data-field='numara']").val();
+
+                if (yeniNumara !== ogrenci.numara && 
+                    studentData.some(o => o.id !== ogrenciId && o.numara === yeniNumara)) {
+                    bildirimGoster("Bu okul numarası zaten kullanılıyor!");
+                    return;
+                }
+
+                ogrenci.ad = yeniAd;
+                ogrenci.soyad = yeniSoyad;
+                ogrenci.sinif = yeniSinif;
+                ogrenci.numara = yeniNumara;
+
+                tabloGuncelle();
+                tr.removeClass("editable");
+                
+                bildirimGoster("Öğrenci bilgileri güncellendi!");
+            });
+
+            $("#ogrenciTablosu").on("click", ".cancel-btn", function() {
+                tabloGuncelle();
+                $(this).closest("tr").removeClass("editable");
+            });
+
+            $("#ogrenciTablosu").on("dblclick", "tr", function(e) {
+                if ($(e.target).is("button") || $(e.target).is("input") || $(e.target).is("select") || 
+                    $(this).hasClass("editable")) {
+                    return;
+                }
+                
+                let ogrenciId = $(this).data("id");
+                $(this).find(".edit-btn").click();
+            });
+
+            $("#ogrenciTablosu").on("click", "tr", function(e) {
+                if ($(e.target).is("button") || $(e.target).is("input") || $(e.target).is("select")) {
+                    return;
+                }
+                
+                $(this).toggleClass("selected");
+            });
+            
+            $("#searchInput").keyup(function() {
+                let arananMetin = $(this).val().toLowerCase();
+                let secilenSinif = $("#sinifFilter").val();
+                
+                filtreleVeGuncelle(secilenSinif, arananMetin);
+            });
+            
+            $("#ogrenciTablosu th[data-sort]").click(function() {
+                let sutun = $(this).data("sort");
+
+                if (sortState.column === sutun) {
+                    sortState.ascending = !sortState.ascending;
+                } else {
+                    sortState.column = sutun;
+                    sortState.ascending = true;
+                }
+
+                tabloGuncelle();
+
+                bildirimGoster(`${$(this).text()} sütununa göre ${sortState.ascending ? 'artan' : 'azalan'} sıralama yapıldı.`);
+            });
+
+            let fareHareketi = 0;
+            $(document).mousemove(function() {
+                fareHareketi++;
+                if (fareHareketi % 100 === 0) {
+                    console.log("Fare hareketleri: " + fareHareketi);
+                }
+            });
+
+            $(window).resize(function() {
+                console.log("Pencere boyutu değişti: " + window.innerWidth + "x" + window.innerHeight);
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
