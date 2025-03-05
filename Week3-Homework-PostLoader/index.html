@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Yükleyici</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        #postList {
+            list-style: none;
+            padding: 0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .post {
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .post h3 {
+            margin: 0 0 15px;
+            color: #333;
+            text-transform: capitalize;
+        }
+        .post p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        .highlight {
+            background-color: #f7f9ff;
+            border-left: 4px solid #4a76a8;
+        }
+        #loading {
+            text-align: center;
+            padding: 15px;
+            margin: 20px auto;
+            width: 180px;
+            border-radius: 50px;
+            background-color: #4a76a8;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #loadingContainer {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #errorMessage {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 8px;
+            background-color: #e74c3c;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #retryButton {
+            background-color: white;
+            color: #e74c3c;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSONPlaceholder Postları</h1>
+    <ul id="postList"></ul>
+    <div id="loadingContainer">
+        <div id="loading" style="display: none;"><span class="spinner"></span> Yükleniyor...</div>
+    </div>
+    <div id="errorMessage">
+        Veriler yüklenirken hata oluştu!
+        <br>
+        <button id="retryButton">Tekrar Dene</button>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            let start = 0;
+            const limit = 5;
+            let isLoading = false;
+
+            loadPosts();
+
+            $("#retryButton").on("click", function() {
+                $("#errorMessage").hide();
+                loadPosts();
+            });
+
+            $("#postList").on("click", ".post", function() {
+                $(this).toggleClass("highlight");
+            });
+
+            let scrollTimeout;
+            $(window).scroll(function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 150) {
+                        loadPosts();
+                    }
+                }, 300);
+            });
+            
+            function loadPosts() {
+                if (isLoading) return;
+
+                isLoading = true;
+                $("#loading").show();
+                $("#errorMessage").hide();
+
+                $.get(`https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${limit}`)
+                    .done(function(posts) {
+                        setTimeout(function() {
+                            if (posts.length === 0) {
+                                $("#loading").hide();
+                                $("<div style='text-align:center; font-weight:bold; margin:30px 0; color:#666;'>Tüm postlar yüklendi!</div>")
+                                    .appendTo("#postList");
+                                return;
+                            }
+
+                            posts.forEach(post => {
+                                const $post = $(`
+                                    <li class="post">
+                                        <h3>${post.title}</h3>
+                                        <p>${post.body}</p>
+                                    </li>
+                                `);
+                                
+                                $("#postList").append($post);
+
+                                $post.hover(
+                                    function() { 
+                                        $(this).css({
+                                            'transform': 'translateY(-5px)',
+                                            'box-shadow': '0 8px 15px rgba(0, 0, 0, 0.1)'
+                                        }); 
+                                    },
+                                    function() { 
+                                        $(this).css({
+                                            'transform': 'translateY(0)',
+                                            'box-shadow': '0px 4px 6px rgba(0, 0, 0, 0.1)'
+                                        }); 
+                                    }
+                                );
+                            });
+                            
+                            start += limit;
+
+                            isLoading = false;
+                            $("#loading").hide();
+                        }, 500);
+                    })
+                    .fail(function(error) {
+                        $("#errorMessage").show();
+                        console.error("API error:", error);
+
+                        isLoading = false;
+                        $("#loading").hide();
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
