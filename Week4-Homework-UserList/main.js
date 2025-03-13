@@ -303,9 +303,16 @@ $(document).ready(function() {
     const init = async () => {
         createStyles();
 
-        const storedData = JSON.parse(localStorage.getItem('userData')) || {users: [], timestamp: 0};
+        let storedData;
+        try {
+            storedData = JSON.parse(localStorage.getItem('userData')) || {users: [], timestamp:0};
+        } catch (error) {
+            console.error("localStorage verisi bozuk:", error);
+            storedData = {users: [], timestamp: 0};
+        }
 
-        if (storedData.users.length > 0 && !isDataExpired(storedData.timestamp)) {
+        if (storedData && storedData.users && Array.isArray(storedData.users) && storedData.users.length > 0 && !isDataExpired(storedData.timestamp)) {
+            
             console.log("localStorage'dan veriler yüklendi.");
             displayUsers(storedData.users);
 
